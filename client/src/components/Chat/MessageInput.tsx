@@ -1,154 +1,177 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Paperclip, Smile, Send, Sword, Coins, Gift } from 'lucide-react';
+import { Send, Plus, X } from 'lucide-react';
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, metadata?: any) => void;
   onStartTyping: () => void;
   onStopTyping: () => void;
   onCreateChallenge: () => void;
   disabled?: boolean;
   isConnected?: boolean;
+  replyTo?: {
+    id: number;
+    content: string;
+    user: {
+      firstName?: string;
+      username?: string;
+    };
+  } | null;
+  onCancelReply?: () => void;
 }
 
-export function MessageInput({ 
-  onSendMessage, 
-  onStartTyping, 
-  onStopTyping, 
+export function MessageInput({
+  onSendMessage,
+  onStartTyping,
+  onStopTyping,
   onCreateChallenge,
-  disabled,
-  isConnected = true
+  disabled = false,
+  isConnected = true,
+  replyTo,
+  onCancelReply,
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const [showActions, setShowActions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSend = () => {
-    if (message.trim() && !disabled) {
-      onSendMessage(message.trim());
-      setMessage('');
-      handleStopTyping();
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-    
-    if (!isTyping && e.target.value.length > 0) {
-      setIsTyping(true);
-      onStartTyping();
-    }
-    
-    // Clear existing timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    
-    // Set new timeout
-    typingTimeoutRef.current = setTimeout(() => {
-      handleStopTyping();
-    }, 1000);
-  };
-
-  const handleStopTyping = () => {
-    if (isTyping) {
-      setIsTyping(false);
-      onStopTyping();
-    }
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-  };
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    return () => {
+    if (replyTo && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [replyTo]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || disabled || !isConnected) return;
+
+    const metadata: any = {};
+    
+    if (replyTo) {
+      metadata.replyTo = replyTo;
+    }
+
+    // Extract mentions
+    const mentions = message.match(/@(\w+)/g)?.map(mention => mention.substring(1)) || [];
+    if (mentions.length > 0) {
+      metadata.mentions = mentions;
+    }
+
+    onSendMessage(message.trim(), Object.keys(metadata).length > 0 ? metadata : undefined);
+    setMessage('');
+    onStopTyping();
+    
+    if (onCancelReply) {
+      onCancelReply();
+    }
+  };
+
+  const handleChange = (value: string) => {
+    setMessage(value);
+
+    // Handle typing indicators
+    if (value.length > 0) {
+      onStartTyping();
+      
+      // Clear existing timeout
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-    };
-  }, []);
+
+      // Stop typing after 3 seconds of inactivity
+      typingTimeoutRef.current = setTimeout(() => {
+        onStopTyping();
+      }, 3000);
+    } else {
+      onStopTyping();
+    }
+  };
 
   return (
-    <div className="border-t p-4">
-      {!isConnected && (
-        <div className="mb-2 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded">
-          Real-time chat disconnected. Messages will still be sent.
+    <div className="border-t bg-background p-4">
+      {/* Reply indicator */}
+      {replyTo && (
+        <div className="mb-2 p-2 bg-muted/50 rounded flex items-center justify-between">
+          <div className="flex-1">
+            <div className="text-xs text-muted-foreground mb-1">
+              Replying to {replyTo.user.firstName || replyTo.user.username}
+            </div>
+            <p className="text-sm truncate">{replyTo.content}</p>
+          </div>
+          {onCancelReply && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancelReply}
+              className="h-6 w-6 p-0 ml-2"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       )}
-      <div className="flex items-center gap-3">
-        {/* File Upload */}
-        <Button variant="ghost" size="icon" className="h-10 w-10">
-          <Paperclip className="h-4 w-4" />
-        </Button>
-        
-        {/* Message Input */}
-        <div className="flex-1 relative">
-          <Input
-            ref={inputRef}
-            type="text"
-            placeholder="Type your message..."
-            value={message}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyPress}
-            disabled={disabled}
-            className="pr-12 bg-muted/50"
-          />
+
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <div className="relative">
           <Button
+            type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+            onClick={() => setShowActions(!showActions)}
+            className="shrink-0"
           >
-            <Smile className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
           </Button>
+          
+          {showActions && (
+            <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 z-10">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  onCreateChallenge();
+                  setShowActions(false);
+                }}
+                className="w-full justify-start"
+              >
+                Create Challenge
+              </Button>
+            </div>
+          )}
         </div>
 
-        {/* Send Button */}
-        <Button 
-          onClick={handleSend}
-          disabled={!message.trim() || disabled}
-          className="h-10 w-10 p-0"
+        <Input
+          ref={inputRef}
+          value={message}
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder={replyTo ? "Type your reply..." : "Type a message... (@username to mention)"}
+          disabled={disabled || !isConnected}
+          className="flex-1"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && onCancelReply) {
+              onCancelReply();
+            }
+          }}
+        />
+
+        <Button
+          type="submit"
+          disabled={!message.trim() || disabled || !isConnected}
+          size="icon"
+          className="shrink-0"
         >
           <Send className="h-4 w-4" />
         </Button>
-      </div>
+      </form>
 
-      {/* Quick Actions */}
-      <div className="flex items-center gap-2 mt-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20"
-          onClick={onCreateChallenge}
-        >
-          <Sword className="h-4 w-4 mr-1" />
-          Challenge
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-100 dark:hover:bg-yellow-900/20"
-        >
-          <Coins className="h-4 w-4 mr-1" />
-          Bet
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
-        >
-          <Gift className="h-4 w-4 mr-1" />
-          Gift Points
-        </Button>
-      </div>
+      {!isConnected && (
+        <div className="text-xs text-destructive mt-1 text-center">
+          Disconnected from chat server
+        </div>
+      )}
     </div>
   );
 }

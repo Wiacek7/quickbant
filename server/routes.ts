@@ -146,6 +146,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/events/:eventId/messages/:messageId/react', isAuthenticated, async (req: any, res) => {
+    try {
+      const messageId = parseInt(req.params.messageId);
+      const { emoji } = req.body;
+      const userId = req.user.claims.sub;
+
+      if (!emoji) {
+        return res.status(400).json({ message: "Emoji is required" });
+      }
+
+      // For now, we'll just return success. In a real app, you'd store reactions in the database
+      // and update the message metadata
+      res.json({ success: true, emoji, messageId });
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+      res.status(500).json({ message: "Failed to add reaction" });
+    }
+  });
+
   app.post('/api/events/:id/messages', isAuthenticated, async (req: any, res) => {
     try {
       const eventId = parseInt(req.params.id);

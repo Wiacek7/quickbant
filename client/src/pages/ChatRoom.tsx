@@ -248,7 +248,7 @@ const ChatRoom = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/60">
               <Users className="w-4 h-4" />
-              <span className="text-sm">{(event as any)?.participantCount || 0} participants</span>
+              <span className="text-sm">{(event as any)?.participantCount || 0} active participant{((event as any)?.participantCount || 0) !== 1 ? 's' : ''}</span>
             </div>
             <Button
               onClick={joinEvent}
@@ -279,11 +279,15 @@ const ChatRoom = () => {
                   <img
                     src={(msg.user as any)?.profileImageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.user.id}`}
                     alt="User"
-                    className="w-8 h-8 rounded-full border border-white/20"
+                    className="w-8 h-8 rounded-full border border-white/20 cursor-pointer hover:ring-2 hover:ring-white/30 transition-all"
+                    onClick={() => {
+                      // This could open a profile modal in the future
+                      console.log('Profile clicked for user:', msg.user.id);
+                    }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-sm">
+                      <span className="font-semibold text-white text-sm cursor-pointer hover:underline">
                         {(msg.user as any)?.firstName || 'Anonymous'}
                       </span>
                       <span className="text-white/50 text-xs">

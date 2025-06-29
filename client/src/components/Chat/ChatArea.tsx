@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Message } from './Message';
@@ -6,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePusher } from '@/hooks/usePusher';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { Users } from 'lucide-react';
 
 interface ChatAreaProps {
   eventId?: number;
@@ -17,6 +19,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [replyTo, setReplyTo] = useState<any>(null);
+  const [activeUsers, setActiveUsers] = useState<number>(0);
 
   // Fetch initial messages
   const { data: initialMessages = [] } = useQuery({
@@ -24,30 +28,39 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     enabled: !!eventId,
   });
 
-  // WebSocket connection with debounced event ID
-  const [debouncedEventId, setDebouncedEventId] = useState<number | undefined>(eventId);
+  // Fetch event details for participant count
+  const { data: eventData } = useQuery({
+    queryKey: ['/api/events', eventId],
+    enabled: !!eventId,
+  });
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedEventId(eventId);
-    }, 300); // Debounce eventId changes
-
-    return () => clearTimeout(timer);
-  }, [eventId]);
-
+  // WebSocket connection
   const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = usePusher({
     eventId,
     onMessage: (pusherMessage) => {
       if (pusherMessage.type === 'new_message') {
         setMessages(prev => {
-          // Avoid duplicates by checking if message already exists
           const messageExists = prev.some(msg => msg.id === pusherMessage.message.id);
           if (!messageExists) {
+            // Create notification for new message
+            if (pusherMessage.message.eventId === eventId) {
+              // Don't create notification for own messages
+              const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+              if (pusherMessage.message.userId !== currentUser.id) {
+                createMessageNotification(pusherMessage.message);
+              }
+            }
             return [...prev, pusherMessage.message];
           }
           return prev;
         });
         queryClient.invalidateQueries({ queryKey: ['messages', eventId] });
+      } else if (pusherMessage.type === 'user_joined') {
+        setActiveUsers(prev => prev + 1);
+      } else if (pusherMessage.type === 'user_left') {
+        setActiveUsers(prev => Math.max(0, prev - 1));
+      } else if (pusherMessage.type === 'active_users_count') {
+        setActiveUsers(pusherMessage.count);
       }
     },
   });
@@ -59,6 +72,13 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     }
   }, [initialMessages]);
 
+  // Update active users from event data
+  useEffect(() => {
+    if (eventData?.participantCount) {
+      setActiveUsers(eventData.participantCount);
+    }
+  }, [eventData]);
+
   // Scroll to bottom when messages change
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,6 +87,26 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Create notification for new messages
+  const createMessageNotification = async (message: any) => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'message',
+          title: 'New Message',
+          content: `${message.user?.firstName || 'Someone'} sent a message in ${eventData?.name || 'an event'}`,
+          relatedId: eventId,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to create notification:', error);
+    }
+  };
 
   // Accept challenge mutation
   const acceptChallengeMutation = useMutation({
@@ -114,11 +154,10 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     },
   });
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, metadata?: any) => {
     if (!eventId || !content.trim()) return;
 
     try {
-      // Send message via API
       const response = await fetch(`/api/events/${eventId}/messages`, {
         method: 'POST',
         headers: {
@@ -127,6 +166,7 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
         body: JSON.stringify({
           content: content.trim(),
           type: 'message',
+          metadata,
         }),
       });
 
@@ -135,8 +175,6 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
       }
 
       const newMessage = await response.json();
-      
-      // Add message to local state immediately for better UX
       setMessages(prev => [...prev, newMessage]);
       
     } catch (error) {
@@ -144,6 +182,52 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReply = (messageId: number, content: string) => {
+    const originalMessage = messages.find(msg => msg.id === messageId);
+    if (originalMessage) {
+      setReplyTo({
+        id: messageId,
+        content: originalMessage.content,
+        user: originalMessage.user,
+      });
+    }
+  };
+
+  const handleReact = async (messageId: number, emoji: string) => {
+    try {
+      await fetch(`/api/events/${eventId}/messages/${messageId}/react`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emoji }),
+      });
+      
+      // Update local state optimistically
+      setMessages(prev => prev.map(msg => {
+        if (msg.id === messageId) {
+          const reactions = { ...msg.metadata?.reactions } || {};
+          reactions[emoji] = (reactions[emoji] || 0) + 1;
+          return {
+            ...msg,
+            metadata: {
+              ...msg.metadata,
+              reactions,
+            },
+          };
+        }
+        return msg;
+      }));
+    } catch (error) {
+      console.error('Failed to add reaction:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add reaction. Please try again.",
         variant: "destructive",
       });
     }
@@ -170,14 +254,24 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Connection Status */}
-      {!isConnected && (
-        <div className="bg-yellow-500/10 border-b border-yellow-500/20 p-2 text-center">
-          <span className="text-sm text-yellow-600 dark:text-yellow-400">
-            Connecting to chat...
-          </span>
+      {/* Connection Status and Active Users */}
+      <div className="border-b bg-background p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {!isConnected && (
+              <div className="bg-yellow-500/10 border border-yellow-500/20 px-2 py-1 rounded-full">
+                <span className="text-sm text-yellow-600 dark:text-yellow-400">
+                  Connecting...
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Users className="w-4 h-4" />
+            <span>{activeUsers} active user{activeUsers !== 1 ? 's' : ''}</span>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -187,6 +281,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
             message={message}
             onAcceptChallenge={handleAcceptChallenge}
             onDeclineChallenge={handleDeclineChallenge}
+            onReply={handleReply}
+            onReact={handleReact}
           />
         ))}
 
@@ -218,6 +314,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
         onCreateChallenge={onCreateChallenge}
         disabled={false}
         isConnected={isConnected}
+        replyTo={replyTo}
+        onCancelReply={() => setReplyTo(null)}
       />
     </div>
   );
