@@ -54,7 +54,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
   // Accept challenge mutation
   const acceptChallengeMutation = useMutation({
     mutationFn: async (challengeId: number) => {
-      await apiRequest('PATCH', `/api/challenges/${challengeId}`, { status: 'accepted' });
+      const response = await apiRequest('PATCH', `/api/challenges/${challengeId}`, { status: 'accepted' });
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -63,10 +64,11 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/challenges'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Failed to accept challenge:', error);
       toast({
         title: "Error",
-        description: "Failed to accept challenge",
+        description: error?.message || "Failed to accept challenge",
         variant: "destructive",
       });
     },
@@ -75,7 +77,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
   // Decline challenge mutation
   const declineChallengeMutation = useMutation({
     mutationFn: async (challengeId: number) => {
-      await apiRequest('PATCH', `/api/challenges/${challengeId}`, { status: 'rejected' });
+      const response = await apiRequest('PATCH', `/api/challenges/${challengeId}`, { status: 'rejected' });
+      return response;
     },
     onSuccess: () => {
       toast({
@@ -84,10 +87,11 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/challenges'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Failed to decline challenge:', error);
       toast({
         title: "Error",
-        description: "Failed to decline challenge",
+        description: error?.message || "Failed to decline challenge",
         variant: "destructive",
       });
     },

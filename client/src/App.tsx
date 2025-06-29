@@ -9,6 +9,7 @@ import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
 import Events from "@/pages/Events";
 import ChatRoom from "@/pages/ChatRoom";
+import ChatTest from "@/pages/ChatTest";
 import AuthTest from "@/pages/AuthTest";
 import NotFound from "@/pages/not-found";
 
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/home" component={Home} />
       <Route path="/landing" component={Landing} />
       <Route path="/chat/:eventId" component={ChatRoom} />
+      <Route path="/chat-test" component={ChatTest} />
       <Route path="/auth-test" component={AuthTest} />
       <Route component={NotFound} />
     </Switch>
