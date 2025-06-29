@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { usePusher } from '@/hooks/usePusher';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +17,12 @@ const ChatTest = () => {
   // Use event ID 1 for testing
   const testEventId = 1;
 
-  const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = useWebSocket({
+  const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = usePusher({
     eventId: testEventId,
-    onMessage: (wsMessage) => {
-      console.log('Received WebSocket message:', wsMessage);
-      if (wsMessage.type === 'new_message') {
-        setMessages(prev => [...prev, wsMessage.message]);
+    onMessage: (pusherMessage) => {
+      console.log('Received Pusher message:', pusherMessage);
+      if (pusherMessage.type === 'new_message') {
+        setMessages(prev => [...prev, pusherMessage.message]);
         scrollToBottom();
       }
     },

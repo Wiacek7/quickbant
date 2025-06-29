@@ -1,10 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertEventSchema, insertChatMessageSchema, insertChallengeSchema } from "@shared/schema";
 import { z } from "zod";
+import Pusher from "pusher";
+
+const pusher = new Pusher({
+  appId: "2015215",
+  key: "1815375eec67f627d132",
+  secret: "db0468127736c8a935b8",
+  cluster: "mt1",
+  useTLS: true
+});
 
 interface ExtendedWebSocket extends WebSocket {
   userId?: string;
@@ -70,15 +78,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         creatorId: userId,
       });
-      
+
       const event = await storage.createEvent(validatedData);
-      
+
       // Auto-join creator to the event
       await storage.joinEvent({
         eventId: event.id,
         userId: userId,
       });
-      
+
       res.json(event);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -93,18 +101,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const eventId = parseInt(req.params.id);
-      
+
       // Check if user is already participating
       const existing = await storage.getUserEventParticipation(eventId, userId);
       if (existing && existing.status === 'active') {
         return res.status(400).json({ message: "Already participating in this event" });
       }
-      
+
       const participation = await storage.joinEvent({
         eventId,
         userId,
       });
-      
+
       res.json(participation);
     } catch (error) {
       console.error("Error joining event:", error);
@@ -116,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const eventId = parseInt(req.params.id);
-      
+
       await storage.leaveEvent(eventId, userId);
       res.json({ message: "Left event successfully" });
     } catch (error) {
@@ -158,21 +166,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const message = await storage.createMessage(validatedData);
 
-      // Broadcast to WebSocket clients
-      wss.clients.forEach((client: ExtendedWebSocket) => {
-        if (client.readyState === WebSocket.OPEN && client.eventId === eventId) {
-          client.send(JSON.stringify({
-            type: 'new_message',
-            message: {
-              ...message,
-              user: {
-                id: userId,
-                firstName: req.user.claims.first_name,
-                profileImageUrl: req.user.claims.profile_image_url,
-              },
-            },
-          }));
-        }
+      // Broadcast via Pusher
+      const user = await storage.getUser(userId);
+      await pusher.trigger(`event-${eventId}`, 'new_message', {
+        message: {
+          ...message,
+          user: {
+            id: userId,
+            firstName: req.user.claims.first_name,
+            profileImageUrl: req.user.claims.profile_image_url,
+          },
+        },
       });
 
       res.json(message);
@@ -212,9 +216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         challengerId: userId,
       });
-      
+
       const challenge = await storage.createChallenge(validatedData);
-      
+
       // Create notification for challenged user
       await storage.createNotification({
         userId: challenge.challengedId,
@@ -223,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: `You have been challenged to a ${challenge.type} match`,
         relatedId: challenge.id,
       });
-      
+
       res.json(challenge);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -238,9 +242,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const challengeId = parseInt(req.params.id);
       const { status, winnerUserId } = req.body;
-      
+
       const challenge = await storage.updateChallengeStatus(challengeId, status, winnerUserId);
-      
+
       // Create notifications based on status change
       if (status === 'accepted') {
         await storage.createNotification({
@@ -257,7 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const entryFee = challenge.entryFee || 0;
           await storage.updateUserCoins(winnerUserId, (user.coins || 0) + entryFee * 2);
         }
-        
+
         await storage.createNotification({
           userId: winnerUserId,
           type: 'challenge',
@@ -266,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           relatedId: challengeId,
         });
       }
-      
+
       res.json(challenge);
     } catch (error) {
       console.error("Error updating challenge:", error);
@@ -308,104 +312,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Pusher trigger endpoint
+  app.post("/api/pusher/trigger", isAuthenticated, async (req: any, res) => {
+    try {
+      const { channel, event, data } = req.body;
 
-  // WebSocket setup for real-time chat
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-  
-  wss.on('connection', (ws: ExtendedWebSocket, request) => {
-    console.log('New WebSocket connection');
-    
-    ws.on('message', async (data) => {
-      try {
-        const message = JSON.parse(data.toString());
-        
-        switch (message.type) {
-          case 'join_event':
-            ws.userId = message.userId;
-            ws.eventId = message.eventId;
-            console.log(`User ${message.userId} joined event ${message.eventId}`);
-            break;
-            
-          case 'chat_message':
-            if (ws.userId && ws.eventId) {
-              // Save message to database
-              const chatMessage = await storage.createMessage({
-                eventId: ws.eventId,
-                userId: ws.userId,
-                content: message.content,
-                type: message.messageType || 'message',
-                metadata: message.metadata,
-              });
-              
-              // Get user info for the message
-              const user = await storage.getUser(ws.userId);
-              
-              // Broadcast to all clients in the same event
-              const broadcastMessage = {
-                type: 'new_message',
-                message: {
-                  ...chatMessage,
-                  user,
-                },
-              };
-              
-              wss.clients.forEach((client: ExtendedWebSocket) => {
-                if (client.readyState === WebSocket.OPEN && 
-                    client.eventId === ws.eventId) {
-                  client.send(JSON.stringify(broadcastMessage));
-                }
-              });
-            }
-            break;
-            
-          case 'typing_start':
-            if (ws.userId && ws.eventId) {
-              const user = await storage.getUser(ws.userId);
-              const typingMessage = {
-                type: 'user_typing_start',
-                userId: ws.userId,
-                username: user?.username || user?.firstName || 'Unknown',
-                eventId: ws.eventId,
-              };
-              
-              wss.clients.forEach((client: ExtendedWebSocket) => {
-                if (client.readyState === WebSocket.OPEN && 
-                    client.eventId === ws.eventId && 
-                    client.userId !== ws.userId) {
-                  client.send(JSON.stringify(typingMessage));
-                }
-              });
-            }
-            break;
-            
-          case 'typing_stop':
-            if (ws.userId && ws.eventId) {
-              const typingMessage = {
-                type: 'user_typing_stop',
-                userId: ws.userId,
-                eventId: ws.eventId,
-              };
-              
-              wss.clients.forEach((client: ExtendedWebSocket) => {
-                if (client.readyState === WebSocket.OPEN && 
-                    client.eventId === ws.eventId && 
-                    client.userId !== ws.userId) {
-                  client.send(JSON.stringify(typingMessage));
-                }
-              });
-            }
-            break;
-        }
-      } catch (error) {
-        console.error('WebSocket message error:', error);
-      }
-    });
-    
-    ws.on('close', () => {
-      console.log('WebSocket connection closed');
-    });
+      await pusher.trigger(channel, event, data);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Pusher trigger error:', error);
+      res.status(500).json({ message: "Failed to trigger Pusher event" });
+    }
   });
+
+  const httpServer = createServer(app);
 
   return httpServer;
 }

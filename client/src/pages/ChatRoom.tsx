@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { usePusher } from '@/hooks/usePusher';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,12 +55,12 @@ const ChatRoom = () => {
     enabled: !!eventId && isAuthenticated,
   });
 
-  // Set up WebSocket for real-time chat
-  const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = useWebSocket({
-    eventId: eventId || undefined,
-    onMessage: (wsMessage) => {
-      if (wsMessage.type === 'new_message' && wsMessage.message) {
-        setMessages(prev => [...prev, wsMessage.message]);
+  // Set up Pusher for real-time chat
+  const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = usePusher({
+    eventId: Number(eventId),
+    onMessage: (pusherMessage) => {
+      if (pusherMessage.type === 'new_message') {
+        setMessages(prev => [...prev, pusherMessage.message]);
         scrollToBottom();
       }
     },
@@ -100,10 +100,10 @@ const ChatRoom = () => {
       }
 
       const newMessage = await response.json();
-      
-      // Also send via WebSocket for real-time delivery
+
+      // Also send via Pusher for real-time delivery
       sendChatMessage(message.trim());
-      
+
       setMessage('');
       stopTyping();
     } catch (error) {
@@ -117,15 +117,15 @@ const ChatRoom = () => {
 
   const handleTyping = (value: string) => {
     setMessage(value);
-    
+
     // Start typing indicator
     startTyping();
-    
+
     // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     // Stop typing after 3 seconds of inactivity
     typingTimeoutRef.current = setTimeout(() => {
       stopTyping();
@@ -237,7 +237,7 @@ const ChatRoom = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/60">
               <Users className="w-4 h-4" />
@@ -289,7 +289,7 @@ const ChatRoom = () => {
                   </div>
                 </div>
               ))}
-              
+
               {/* Typing indicators */}
               {typingUsers.length > 0 && (
                 <div className="flex items-center gap-2 text-white/60">
@@ -303,7 +303,7 @@ const ChatRoom = () => {
                   </span>
                 </div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
           )}

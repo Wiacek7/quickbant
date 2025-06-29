@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Message } from './Message';
 import { MessageInput } from './MessageInput';
 import { Badge } from '@/components/ui/badge';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { usePusher } from '@/hooks/usePusher';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,21 +26,20 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
 
   // WebSocket connection with debounced event ID
   const [debouncedEventId, setDebouncedEventId] = useState<number | undefined>(eventId);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedEventId(eventId);
     }, 300); // Debounce eventId changes
-    
+
     return () => clearTimeout(timer);
   }, [eventId]);
 
-  const { sendChatMessage, startTyping, stopTyping, typingUsers, isConnected } = useWebSocket({
-    eventId: debouncedEventId,
-    onMessage: (wsMessage) => {
-      if (wsMessage.type === 'new_message') {
-        setMessages(prev => [...prev, wsMessage.message]);
-        scrollToBottom();
+  const { isConnected, sendChatMessage, startTyping, stopTyping, typingUsers } = usePusher({
+    eventId,
+    onMessage: (pusherMessage) => {
+      if (pusherMessage.type === 'new_message') {
+        queryClient.invalidateQueries({ queryKey: ['messages', eventId] });
       }
     },
   });
