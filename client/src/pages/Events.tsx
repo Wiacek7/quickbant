@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Users, Calendar, MapPin, Trophy, Plus, Clock, Gamepad2, Bell } from 'lucide-react';
+import { Users, Calendar, MapPin, Trophy, Plus, Clock, Gamepad2, Bell, Music2, Coins, TrendingUp, Search } from 'lucide-react';
 import { ChallengeModal } from '@/components/Modals/ChallengeModal';
 import { NotificationPopup } from '@/components/Notifications/NotificationPopup';
 import { NotificationsModal } from '@/components/Notifications/NotificationsModal';
@@ -45,10 +45,7 @@ const Events = () => {
     enabled: true,
   });
 
-  const { data: user } = useQuery({
-    queryKey: ['/api/auth/user'],
-    enabled: isAuthenticated,
-  });
+
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['/api/notifications'],
@@ -148,7 +145,7 @@ const Events = () => {
       label: 'Music',
       gradient: 'from-[#A020F0] to-[#CCFF00]',
       bgColor: 'bg-[#1F1435]',
-      icon: <Music className="w-6 h-6" />,
+      icon: <Music2 className="w-6 h-6" />,
     },
     {
       id: 'crypto',
@@ -216,20 +213,9 @@ const Events = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated header for mobile */}
-      <div
-        style={typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? {
-          transform: `translateY(${headerOffset}px)`,
-          transition: 'transform 0.25s cubic-bezier(.4,0,.2,1)',
-          zIndex: 50,
-          position: 'sticky',
-          top: 0,
-          background: 'inherit',
-          pointerEvents: headerOffset === -80 ? 'none' : 'auto',
-          opacity: headerOffset === -80 ? 0 : 1,
-        } : {}}
-      >
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20 lg:pt-24">
+      {/* Main Content Container */}
+      <div className="container mx-auto px-4 pb-24 lg:pb-8">
         {/* Header */}
         <div className="p-4 border-b border-white/10">
           <div className="container mx-auto flex items-center justify-between">
