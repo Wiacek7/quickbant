@@ -339,6 +339,29 @@
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Connection status */
+.connection-indicator {
+  position: relative;
+}
+
+.connection-indicator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: hsl(var(--destructive));
+  animation: pulse 2s infinite;
+}
+
+.connection-indicator.connected::before {
+  background-color: hsl(var(--success));
+  animation: none;
+}
+
 /* Status indicators */
 .status-online {
   @apply bg-green-500;

@@ -18,10 +18,20 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef(0);
-  const maxReconnectAttempts = 5;
+  const maxReconnectAttempts = 3;
+  const isConnectingRef = useRef(false);
+  const mountedRef = useRef(true);
 
   const connect = useCallback(() => {
-    if (!eventId || !user) return;
+    if (!eventId || !user || isConnectingRef.current || !mountedRef.current) return;
+
+    // Clean up existing connection
+    if (wsRef.current) {
+      wsRef.current.close(1000, 'Reconnecting');
+      wsRef.current = null;
+    }
+
+    isConnectingRef.current = true;
 
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -30,8 +40,11 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
+        if (!mountedRef.current) return;
+        
         console.log('WebSocket connected');
         setIsConnected(true);
+        isConnectingRef.current = false;
         reconnectAttempts.current = 0;
 
         // Join the event room
@@ -45,6 +58,8 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
       };
 
       wsRef.current.onmessage = (event) => {
+        if (!mountedRef.current) return;
+        
         try {
           const message = JSON.parse(event.data);
 
@@ -68,37 +83,57 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
       };
 
       wsRef.current.onclose = (event) => {
+        if (!mountedRef.current) return;
+        
         console.log('WebSocket disconnected', event.code, event.reason);
         setIsConnected(false);
         setTypingUsers([]);
+        isConnectingRef.current = false;
 
-        // Only attempt to reconnect if it wasn't a manual close
-        if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
-          const timeout = Math.pow(2, reconnectAttempts.current) * 1000; // Exponential backoff
+        // Only attempt to reconnect if it wasn't a manual close and we haven't exceeded max attempts
+        if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts && mountedRef.current) {
+          const timeout = Math.min(Math.pow(2, reconnectAttempts.current) * 1000, 10000); // Cap at 10 seconds
+          
+          if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+          }
+          
           reconnectTimeoutRef.current = setTimeout(() => {
-            reconnectAttempts.current++;
-            connect();
+            if (mountedRef.current) {
+              reconnectAttempts.current++;
+              connect();
+            }
           }, timeout);
         }
       };
 
       wsRef.current.onerror = (error) => {
+        if (!mountedRef.current) return;
+        
         console.error('WebSocket error:', error);
         setIsConnected(false);
+        isConnectingRef.current = false;
       };
     } catch (error) {
       console.error('Failed to connect WebSocket:', error);
       setIsConnected(false);
+      isConnectingRef.current = false;
     }
   }, [eventId, user, onMessage]);
 
   const disconnect = useCallback(() => {
+    mountedRef.current = false;
+    isConnectingRef.current = false;
+    
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = undefined;
     }
 
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.close(1000, 'Manual disconnect');
+    if (wsRef.current) {
+      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
+        wsRef.current.close(1000, 'Manual disconnect');
+      }
       wsRef.current = null;
     }
 
@@ -136,20 +171,32 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
   }, [sendMessage]);
 
   useEffect(() => {
-    connect();
-    return disconnect;
-  }, [connect, disconnect]);
-
-  // Rejoin event when eventId changes
-  useEffect(() => {
-    if (isConnected && eventId && user) {
-      sendMessage({
-        type: 'join_event',
-        userId: (user as any).id,
-        eventId,
-      });
+    mountedRef.current = true;
+    
+    // Only connect if we have the required data
+    if (eventId && user) {
+      connect();
     }
-  }, [isConnected, eventId, user, sendMessage]);
+    
+    return () => {
+      disconnect();
+    };
+  }, [eventId, user?.id]); // Only depend on eventId and user.id
+
+  // Rejoin event when connection is established
+  useEffect(() => {
+    if (isConnected && eventId && user && wsRef.current?.readyState === WebSocket.OPEN) {
+      try {
+        wsRef.current.send(JSON.stringify({
+          type: 'join_event',
+          userId: (user as any).id,
+          eventId,
+        }));
+      } catch (error) {
+        console.error('Failed to rejoin event:', error);
+      }
+    }
+  }, [isConnected, eventId, user?.id]);
 
   return {
     isConnected,

@@ -9,6 +9,7 @@ interface MessageInputProps {
   onStopTyping: () => void;
   onCreateChallenge: () => void;
   disabled?: boolean;
+  isConnected?: boolean;
 }
 
 export function MessageInput({ 
@@ -16,7 +17,8 @@ export function MessageInput({
   onStartTyping, 
   onStopTyping, 
   onCreateChallenge,
-  disabled 
+  disabled,
+  isConnected = true
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -77,6 +79,11 @@ export function MessageInput({
 
   return (
     <div className="border-t p-4">
+      {!isConnected && (
+        <div className="mb-2 text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded">
+          Real-time chat disconnected. Messages will still be sent.
+        </div>
+      )}
       <div className="flex items-center gap-3">
         {/* File Upload */}
         <Button variant="ghost" size="icon" className="h-10 w-10">

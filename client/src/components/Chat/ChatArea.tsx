@@ -24,9 +24,19 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     enabled: !!eventId,
   });
 
-  // WebSocket connection
+  // WebSocket connection with debounced event ID
+  const [debouncedEventId, setDebouncedEventId] = useState<number | undefined>(eventId);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedEventId(eventId);
+    }, 300); // Debounce eventId changes
+    
+    return () => clearTimeout(timer);
+  }, [eventId]);
+
   const { sendChatMessage, startTyping, stopTyping, typingUsers, isConnected } = useWebSocket({
-    eventId,
+    eventId: debouncedEventId,
     onMessage: (wsMessage) => {
       if (wsMessage.type === 'new_message') {
         setMessages(prev => [...prev, wsMessage.message]);
@@ -169,7 +179,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
         onStartTyping={startTyping}
         onStopTyping={stopTyping}
         onCreateChallenge={onCreateChallenge}
-        disabled={!isConnected}
+        disabled={false}
+        isConnected={isConnected}
       />
     </div>
   );
