@@ -387,13 +387,14 @@ const Events = () => {
                       </span>
                     </div>
                     
-                    <Button
-                      onClick={() => handleJoinEvent(event.id)}
-                      size="sm"
-                      className="bg-gradient-to-r from-purple-500 to-yellow-400 text-white font-semibold hover:from-purple-600 hover:to-yellow-500"
-                    >
-                      Join
-                    </Button>
+                    <Link href={`/chat/${event.id}`}>
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-purple-500 to-yellow-400 text-white font-semibold hover:from-purple-600 hover:to-yellow-500"
+                      >
+                        Join Chat
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>

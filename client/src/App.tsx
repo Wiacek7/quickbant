@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
 import Events from "@/pages/Events";
+import ChatRoom from "@/pages/ChatRoom";
+import AuthTest from "@/pages/AuthTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +20,8 @@ function Router() {
       <Route path="/" component={Events} />
       <Route path="/home" component={Home} />
       <Route path="/landing" component={Landing} />
+      <Route path="/chat/:eventId" component={ChatRoom} />
+      <Route path="/auth-test" component={AuthTest} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -138,6 +138,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/events/:id/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      const { content, type = 'message', metadata } = req.body;
+
+      if (!content || !content.trim()) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+
+      const validatedData = insertChatMessageSchema.parse({
+        eventId,
+        userId,
+        content: content.trim(),
+        type,
+        metadata,
+      });
+
+      const message = await storage.createMessage(validatedData);
+
+      // Broadcast to WebSocket clients
+      wss.clients.forEach((client: ExtendedWebSocket) => {
+        if (client.readyState === WebSocket.OPEN && client.eventId === eventId) {
+          client.send(JSON.stringify({
+            type: 'new_message',
+            message: {
+              ...message,
+              user: {
+                id: userId,
+                firstName: req.user.claims.first_name,
+                profileImageUrl: req.user.claims.profile_image_url,
+              },
+            },
+          }));
+        }
+      });
+
+      res.json(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
   // Challenge routes
   app.get('/api/challenges', isAuthenticated, async (req: any, res) => {
     try {
