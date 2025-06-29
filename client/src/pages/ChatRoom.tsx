@@ -251,7 +251,7 @@ const ChatRoom = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/60">
               <Users className="w-4 h-4" />
-              <span className="text-sm">{(event as any)?.participants?.length || 0} participant{((event as any)?.participants?.length || 0) !== 1 ? 's' : ''}</span>
+              <span className="text-sm">{(event as any)?.participantCount || (event as any)?.participants?.length || 0} participant{((event as any)?.participants?.length || 0) !== 1 ? 's' : ''}</span>
             </div>
             <Button
               onClick={joinEvent}

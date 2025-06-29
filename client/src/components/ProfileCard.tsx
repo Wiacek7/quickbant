@@ -42,13 +42,35 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile: initialProfile, user
       if (!initialProfile && userId) {
         setLoading(true);
         try {
-          const response = await fetch(`/api/users/${userId}`);
+          const response = await fetch(`/api/users/${userId}`, {
+            credentials: 'include'
+          });
+          
           if (response.ok) {
             const data = await response.json();
             setProfile(data);
+          } else if (response.status === 404) {
+            console.error('User not found:', userId);
+            toast({
+              title: "Error",
+              description: "User profile not found",
+              variant: "destructive"
+            });
+          } else {
+            console.error('Failed to load profile:', response.status, response.statusText);
+            toast({
+              title: "Error", 
+              description: "Failed to load user profile",
+              variant: "destructive"
+            });
           }
         } catch (error) {
           console.error('Failed to load profile:', error);
+          toast({
+            title: "Error",
+            description: "Network error loading profile",
+            variant: "destructive"
+          });
         } finally {
           setLoading(false);
         }
@@ -56,7 +78,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile: initialProfile, user
     };
 
     loadProfile();
-  }, [userId, initialProfile]);
+  }, [userId, initialProfile, toast]);
 
   const getUserLevel = (level?: number) => {
     if (!level || level < 5) return { badge: 'Novice', color: 'bg-gray-500' };
