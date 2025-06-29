@@ -10,6 +10,7 @@ import {
   User, 
   UserPlus, 
   Swords,
+  Wallet as WalletIcon,
   Bell,
   Settings,
   LogOut
@@ -25,8 +26,9 @@ export function DesktopNav({ notificationCount = 0 }: DesktopNavProps) {
 
   const navigationItems = [
     { path: '/', label: 'Events', icon: Home },
-    { path: '/profile', label: 'Profile', icon: User },
+    { path: '/wallet', label: 'Wallet', icon: WalletIcon },
     { path: '/challenges', label: 'Challenges', icon: Swords },
+    { path: '/profile', label: 'Profile', icon: User },
     { path: '/referrals', label: 'Referrals', icon: UserPlus },
   ];
 
