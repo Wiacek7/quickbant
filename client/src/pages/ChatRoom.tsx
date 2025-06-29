@@ -7,9 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Send, Users, ArrowLeft, Shield } from 'lucide-react';
+import { Send, Users, ArrowLeft, Shield, Bell } from 'lucide-react';
 import { Link } from 'wouter';
 import ProfileCard from '@/components/ProfileCard';
+import { NotificationsModal } from '@/components/Notifications/NotificationsModal';
 
 interface Message {
   id: number;
@@ -43,6 +44,7 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -56,6 +58,13 @@ const ChatRoom = () => {
   const { data: initialMessages = [], isLoading: messagesLoading } = useQuery({
     queryKey: [`/api/events/${eventId}/messages`],
     enabled: !!eventId && isAuthenticated,
+  });
+
+  // Fetch notification count
+  const { data: notificationCount = { count: 0 } } = useQuery({
+    queryKey: ['/api/notifications/count'],
+    enabled: isAuthenticated,
+    refetchInterval: 10000,
   });
 
   // Set up Pusher for real-time chat
@@ -253,6 +262,24 @@ const ChatRoom = () => {
               <Users className="w-4 h-4" />
               <span className="text-sm">{(event as any)?.participantCount || (event as any)?.participants?.length || 0} participant{((event as any)?.participants?.length || 0) !== 1 ? 's' : ''}</span>
             </div>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowNotifications(true)}
+                className="text-white hover:bg-white/10"
+              >
+                <Bell className="w-4 h-4" />
+                {notificationCount.count > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center"
+                  >
+                    {notificationCount.count > 9 ? '9+' : notificationCount.count}
+                  </Badge>
+                )}
+              </Button>
+            </div>
             <Button
               onClick={joinEvent}
               size="sm"
@@ -355,6 +382,12 @@ const ChatRoom = () => {
           />
         </div>
       )}
+
+      {/* Notifications Modal */}
+      <NotificationsModal
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
     </div>
   );
 };

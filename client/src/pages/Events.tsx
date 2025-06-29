@@ -4,10 +4,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { Gamepad2, Search, Plus, Trophy, Music, Coins, Users, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Users, Calendar, MapPin, Trophy, Plus, Clock, Gamepad2, Bell } from 'lucide-react';
+import { ChallengeModal } from '@/components/Modals/ChallengeModal';
+import { NotificationPopup } from '@/components/Notifications/NotificationPopup';
+import { NotificationsModal } from '@/components/Notifications/NotificationsModal';
 
 interface Event {
   id: number;
@@ -31,11 +35,31 @@ const Events = () => {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Fetch events
   const { data: events = [], isLoading: eventsLoading } = useQuery({
     queryKey: ['/api/events'],
     enabled: true,
+  });
+
+  const { data: user } = useQuery({
+    queryKey: ['/api/auth/user'],
+    enabled: isAuthenticated,
+  });
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['/api/notifications'],
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+
+  const { data: notificationCount = { count: 0 } } = useQuery({
+    queryKey: ['/api/notifications/count'],
+    enabled: isAuthenticated,
+    refetchInterval: 10000,
   });
 
   // Set up a refresh interval to ensure the latest data is displayed
@@ -78,11 +102,11 @@ const Events = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to join event');
       }
-      
+
       toast({
         title: "Success",
         description: "Successfully joined the event!",
@@ -162,7 +186,7 @@ const Events = () => {
       setHeaderOffset(0);
       return;
     }
-    
+
     const handleScroll = () => {
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
@@ -178,7 +202,7 @@ const Events = () => {
         ticking.current = true;
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -215,7 +239,7 @@ const Events = () => {
               </div>
               <h1 className="text-xl font-bold text-white">EventChat</h1>
             </div>
-            
+
             <div className="flex items-center gap-4">
               {/* Search */}
               <div className="relative hidden md:block">
@@ -227,7 +251,7 @@ const Events = () => {
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 w-64"
                 />
               </div>
-              
+
               {/* User section */}
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
@@ -274,7 +298,7 @@ const Events = () => {
               >
                 All Events
               </button>
-              
+
               {categories.map((category) => (
                 <button
                   key={category.id}
@@ -355,11 +379,11 @@ const Events = () => {
                       event.status === 'pending' ? 'bg-yellow-400' : 'bg-gray-400'
                     }`} />
                   </div>
-                  
+
                   <p className="text-white/70 text-sm mb-4 line-clamp-2">
                     {event.description || 'Join this exciting event and compete with others!'}
                   </p>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4 text-sm text-white/60">
                       {event.entryFee && (
@@ -374,7 +398,7 @@ const Events = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <img
@@ -386,7 +410,7 @@ const Events = () => {
                         {event.creator?.firstName || 'Anonymous'}
                       </span>
                     </div>
-                    
+
                     <Link href={`/chat/${event.id}`}>
                       <Button
                         size="sm"
@@ -402,6 +426,32 @@ const Events = () => {
           </div>
         )}
       </div>
+       {/* Challenge Modal */}
+       {showChallengeModal && (
+        <ChallengeModal
+          isOpen={showChallengeModal}
+          onClose={() => setShowChallengeModal(false)}
+          onChallengeCreated={() => {
+            setShowChallengeModal(false);
+            toast({
+              title: 'Challenge Sent!',
+              description: 'Your challenge has been sent to the player.',
+            });
+          }}
+        />
+      )}
+
+      {/* Notifications Modal */}
+      <NotificationsModal
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
+
+      {/* Notification Popup */}
+      {/* <NotificationPopup
+        notification={notification}
+        onClose={() => setNotification(null)}
+      /> */}
     </div>
   );
 };
