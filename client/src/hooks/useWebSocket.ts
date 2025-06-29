@@ -38,7 +38,7 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
         if (wsRef.current && user) {
           wsRef.current.send(JSON.stringify({
             type: 'join_event',
-            userId: user.id,
+            userId: (user as any).id,
             eventId,
           }));
         }
@@ -145,7 +145,7 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps) {
     if (isConnected && eventId && user) {
       sendMessage({
         type: 'join_event',
-        userId: user.id,
+        userId: (user as any).id,
         eventId,
       });
     }

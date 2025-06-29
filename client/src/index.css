@@ -157,23 +157,36 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Nunito', Arial, Helvetica, sans-serif;
     color: var(--framer-font-color);
-    @apply bg-light-bg text-light-text transition-colors duration-200;
+    background-color: var(--light-bg);
+    color: var(--light-text);
+    transition: background-color 0.2s, color 0.2s;
   }
 
   .dark body {
-    @apply bg-dark-bg text-dark-text;
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
   }
 
   input, textarea, select {
     font-family: var(--framer-font-family);
     color: var(--framer-font-color);
-    @apply bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text;
+    background-color: var(--light-bg);
+    color: var(--light-text);
+  }
+
+  .dark input, .dark textarea, .dark select {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
   }
 
   button {
     font-family: var(--framer-font-family);
     color: var(--framer-font-color);
-    @apply text-light-text dark:text-dark-text;
+    color: var(--light-text);
+  }
+
+  .dark button {
+    color: var(--dark-text);
   }
 
   body, html, #root {
