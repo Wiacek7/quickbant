@@ -74,8 +74,8 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
 
   // Update active users from event data
   useEffect(() => {
-    if (eventData?.participantCount) {
-      setActiveUsers(eventData.participantCount);
+    if (eventData?.participants) {
+      setActiveUsers(eventData.participants.length);
     }
   }, [eventData]);
 

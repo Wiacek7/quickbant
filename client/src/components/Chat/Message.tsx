@@ -1,4 +1,3 @@
-
 import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -70,7 +69,7 @@ export function Message({ message, onAcceptChallenge, onDeclineChallenge, onRepl
   const parseContent = (content: string) => {
     const mentionRegex = /@(\w+)/g;
     const parts = content.split(mentionRegex);
-    
+
     return parts.map((part, index) => {
       if (index % 2 === 1) {
         // This is a mention
@@ -174,24 +173,15 @@ export function Message({ message, onAcceptChallenge, onDeclineChallenge, onRepl
           )}
 
           {/* Message actions (shown on hover) */}
-          <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0"
-              onClick={() => setShowReactions(!showReactions)}
-              title="Add reaction"
+              className="h-6 px-2 text-xs"
+              onClick={() => onReply && onReply(message.id, message.content)}
             >
-              <Smile className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0"
-              onClick={handleReply}
-              title="Reply"
-            >
-              <MessageCircle className="w-3 h-3" />
+              <Reply className="w-3 h-3 mr-1" />
+              Reply
             </Button>
           </div>
 

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Send, Users, ArrowLeft, Shield } from 'lucide-react';
 import { Link } from 'wouter';
+import ProfileCard from '@/components/ProfileCard';
 
 interface Message {
   id: number;
@@ -40,6 +41,8 @@ const ChatRoom = () => {
   const { toast } = useToast();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -248,7 +251,7 @@ const ChatRoom = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-white/60">
               <Users className="w-4 h-4" />
-              <span className="text-sm">{(event as any)?.participantCount || 0} active participant{((event as any)?.participantCount || 0) !== 1 ? 's' : ''}</span>
+              <span className="text-sm">{(event as any)?.participants?.length || 0} participant{((event as any)?.participants?.length || 0) !== 1 ? 's' : ''}</span>
             </div>
             <Button
               onClick={joinEvent}
@@ -281,8 +284,8 @@ const ChatRoom = () => {
                     alt="User"
                     className="w-8 h-8 rounded-full border border-white/20 cursor-pointer hover:ring-2 hover:ring-white/30 transition-all"
                     onClick={() => {
-                      // This could open a profile modal in the future
-                      console.log('Profile clicked for user:', msg.user.id);
+                      setSelectedUserId(msg.user.id);
+                      setShowProfileCard(true);
                     }}
                   />
                   <div className="flex-1 min-w-0">
@@ -342,6 +345,16 @@ const ChatRoom = () => {
           </form>
         </div>
       </div>
+
+      {/* Profile Card Modal */}
+      {showProfileCard && selectedUserId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowProfileCard(false)}>
+          <ProfileCard
+            userId={selectedUserId}
+            onClose={() => setShowProfileCard(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -64,7 +64,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!event) {
         return res.status(404).json({ message: "Event not found" });
       }
-      res.json(event);
+      
+      // Ensure participants array is included
+      const participants = await storage.getEventParticipants(eventId);
+      const eventWithParticipants = {
+        ...event,
+        participants: participants || [],
+        participantCount: participants?.length || 0
+      };
+      
+      res.json(eventWithParticipants);
     } catch (error) {
       console.error("Error fetching event:", error);
       res.status(500).json({ message: "Failed to fetch event" });
