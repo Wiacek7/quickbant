@@ -1,0 +1,261 @@
+bSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:87 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+printWarning @ chunk-RPCDYKBN.js?v=3181ca56:521
+error @ chunk-RPCDYKBN.js?v=3181ca56:505
+checkForNestedUpdates @ chunk-RPCDYKBN.js?v=3181ca56:19665
+scheduleUpdateOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18533
+dispatchSetState @ chunk-RPCDYKBN.js?v=3181ca56:12403
+wsRef.current.onerror @ useWebSocket.ts:87Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
+(anonymous) @ useWebSocket.ts:30
+(anonymous) @ useWebSocket.ts:139
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=3181ca56:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=3181ca56:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=3181ca56:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=3181ca56:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=3181ca56:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=3181ca56:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=3181ca56:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=3181ca56:19416
+commitRoot @ chunk-RPCDYKBN.js?v=3181ca56:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=3181ca56:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=3181ca56:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=3181ca56:18627Understand this error
+useWebSocket.ts:86 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+wsRef.current.onerror @ useWebSocket.ts:86Understand this error
+useWebSocket.ts:71 WebSocket disconnected 1006 
+useWebSocket.ts:30 WebSocket connection to 'wss://547b33d6-0e05-4d20-aa5e-a49bf4f626cf-00-pj7lmsebd9zn.picard.replit.dev/ws' failed: Insufficient resources
