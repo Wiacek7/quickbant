@@ -16,9 +16,22 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps = {}) {
   const ws = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
+  const connectionAttempts = useRef(0);
 
   const connect = useCallback(() => {
-    if (!user || ws.current?.readyState === WebSocket.OPEN) return;
+    if (!user) return;
+    
+    // Prevent multiple connections
+    if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) {
+      return;
+    }
+
+    // Clear any existing reconnect timeout
+    if (reconnectTimeout.current) {
+      clearTimeout(reconnectTimeout.current);
+      reconnectTimeout.current = null;
+    }
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
@@ -27,10 +40,11 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps = {}) {
 
     ws.current.onopen = () => {
       setIsConnected(true);
+      connectionAttempts.current = 0;
       console.log('WebSocket connected');
       
       // Join event if eventId is provided
-      if (eventId && user) {
+      if (eventId && user?.id) {
         sendMessage({
           type: 'join_event',
           userId: user.id,
@@ -61,8 +75,12 @@ export function useWebSocket({ eventId, onMessage }: UseWebSocketProps = {}) {
       setTypingUsers([]);
       console.log('WebSocket disconnected');
       
-      // Attempt to reconnect after 3 seconds
-      setTimeout(connect, 3000);
+      // Only reconnect if user is still authenticated and we haven't exceeded attempts
+      if (user && connectionAttempts.current < 5) {
+        connectionAttempts.current++;
+        const delay = Math.min(1000 * Math.pow(2, connectionAttempts.current), 30000);
+        reconnectTimeout.current = setTimeout(connect, delay);
+      }
     };
 
     ws.current.onerror = (error) => {
