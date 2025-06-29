@@ -60,8 +60,16 @@ const ChatRoom = () => {
     eventId: Number(eventId),
     onMessage: (pusherMessage) => {
       if (pusherMessage.type === 'new_message') {
-        setMessages(prev => [...prev, pusherMessage.message]);
-        scrollToBottom();
+        setMessages(prev => {
+          // Avoid duplicates by checking if message already exists
+          const messageExists = prev.some(msg => msg.id === pusherMessage.message.id);
+          if (!messageExists) {
+            const newMessages = [...prev, pusherMessage.message];
+            scrollToBottom();
+            return newMessages;
+          }
+          return prev;
+        });
       }
     },
   });
@@ -101,8 +109,7 @@ const ChatRoom = () => {
 
       const newMessage = await response.json();
 
-      // Also send via Pusher for real-time delivery
-      sendChatMessage(message.trim());
+      // Message will be broadcasted via Pusher from the server
 
       setMessage('');
       stopTyping();

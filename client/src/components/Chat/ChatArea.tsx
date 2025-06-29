@@ -39,6 +39,14 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     eventId,
     onMessage: (pusherMessage) => {
       if (pusherMessage.type === 'new_message') {
+        setMessages(prev => {
+          // Avoid duplicates by checking if message already exists
+          const messageExists = prev.some(msg => msg.id === pusherMessage.message.id);
+          if (!messageExists) {
+            return [...prev, pusherMessage.message];
+          }
+          return prev;
+        });
         queryClient.invalidateQueries({ queryKey: ['messages', eventId] });
       }
     },
@@ -106,9 +114,39 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
     },
   });
 
-  const handleSendMessage = (content: string) => {
-    if (!eventId || !isConnected) return;
-    sendChatMessage(content);
+  const handleSendMessage = async (content: string) => {
+    if (!eventId || !content.trim()) return;
+
+    try {
+      // Send message via API
+      const response = await fetch(`/api/events/${eventId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: content.trim(),
+          type: 'message',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const newMessage = await response.json();
+      
+      // Add message to local state immediately for better UX
+      setMessages(prev => [...prev, newMessage]);
+      
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAcceptChallenge = (challengeId: number) => {

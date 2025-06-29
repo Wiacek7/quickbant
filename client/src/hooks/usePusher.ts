@@ -129,8 +129,9 @@ export function usePusher({ eventId, onMessage }: UsePusherProps) {
   }, [eventId, user]);
 
   const sendChatMessage = useCallback((content: string, messageType = 'message', metadata?: any) => {
-    // Don't send via Pusher directly, let the API handle it
-    // This is just for compatibility with existing code
+    // Messages are sent via API and broadcasted by server
+    // This function is kept for compatibility but doesn't need to do anything
+    console.log('Message will be sent via API and broadcasted by server');
   }, []);
 
   const startTyping = useCallback(() => {
