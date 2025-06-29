@@ -55,6 +55,10 @@ export interface IStorage {
   getUserNotifications(userId: string, limit?: number): Promise<Notification[]>;
   markNotificationAsRead(id: number): Promise<void>;
   getUnreadNotificationCount(userId: string): Promise<number>;
+
+    // Additions for reactions
+  getMessage(messageId: number): Promise<ChatMessage | null>;
+  updateMessageMetadata(messageId: number, metadata: any): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -79,11 +83,25 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserCoins(userId: string, amount: number): Promise<void> {
+  async updateUserCoins(userId: string, coins: number): Promise<void> {
+    await db.update(users).set({ coins }).where(eq(users.id, userId));
+  }
+
+  async getMessage(messageId: number) {
+    const result = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.id, messageId))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async updateMessageMetadata(messageId: number, metadata: any): Promise<void> {
     await db
-      .update(users)
-      .set({ coins: amount })
-      .where(eq(users.id, userId));
+      .update(chatMessages)
+      .set({ metadata })
+      .where(eq(chatMessages.id, messageId));
   }
 
   // Event operations
@@ -187,7 +205,7 @@ export class DatabaseStorage implements IStorage {
       updateData.winnerUserId = winnerUserId;
       updateData.completedAt = new Date();
     }
-    
+
     const [updatedChallenge] = await db
       .update(challenges)
       .set(updateData)

@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Smile, Reply, MoreHorizontal } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ProfileCard from '../ProfileCard';
 
 interface MessageProps {
@@ -41,6 +41,24 @@ interface MessageProps {
 export function Message({ message, onAcceptChallenge, onDeclineChallenge, onReply, onReact }: MessageProps) {
   const [showProfileCard, setShowProfileCard] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
+  const reactionPickerRef = useRef<HTMLDivElement>(null);
+
+  // Close reaction picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (reactionPickerRef.current && !reactionPickerRef.current.contains(event.target as Node)) {
+        setShowReactions(false);
+      }
+    };
+
+    if (showReactions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showReactions]);
 
   const getUserLevel = (level?: number) => {
     if (!level || level < 5) return { badge: 'Novice', color: 'bg-gray-500' };
@@ -157,17 +175,16 @@ export function Message({ message, onAcceptChallenge, onDeclineChallenge, onRepl
 
           {/* Message reactions */}
           {message.metadata?.reactions && Object.keys(message.metadata.reactions).length > 0 && (
-            <div className="flex items-center gap-1 mt-2 flex-wrap">
+            <div className="flex items-center gap-1 mt-1.5 flex-wrap">
               {Object.entries(message.metadata.reactions).map(([emoji, count]: [string, any]) => (
-                <Button
+                <button
                   key={emoji}
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs hover:bg-muted rounded-full"
                   onClick={() => handleReaction(emoji)}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-muted/50 hover:bg-muted rounded-full transition-colors border border-transparent hover:border-primary/20"
                 >
-                  {emoji} {count}
-                </Button>
+                  <span className="text-sm">{emoji}</span>
+                  <span className="text-xs font-medium text-muted-foreground">{count}</span>
+                </button>
               ))}
             </div>
           )}
@@ -183,16 +200,29 @@ export function Message({ message, onAcceptChallenge, onDeclineChallenge, onRepl
               <Reply className="w-3 h-3 mr-1" />
               Reply
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              onClick={() => setShowReactions(!showReactions)}
+            >
+              <Smile className="w-3 h-3 mr-1" />
+              React
+            </Button>
           </div>
 
           {/* Reaction picker */}
           {showReactions && (
-            <div className="absolute z-10 mt-1 p-2 bg-white border rounded-lg shadow-lg flex gap-1">
-              {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
+            <div 
+              ref={reactionPickerRef}
+              className="absolute z-20 mt-1 p-1 bg-background border rounded-lg shadow-lg flex gap-0.5"
+            >
+              {['👍', '❤️', '😂', '😮', '😢', '😡', '🎉', '👏'].map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => handleReaction(emoji)}
-                  className="p-1 hover:bg-gray-100 rounded text-lg"
+                  className="p-1.5 hover:bg-muted rounded text-sm transition-colors"
+                  title={`React with ${emoji}`}
                 >
                   {emoji}
                 </button>

@@ -55,6 +55,19 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
           return prev;
         });
         queryClient.invalidateQueries({ queryKey: ['messages', eventId] });
+      } else if (pusherMessage.type === 'reaction_update') {
+        setMessages(prev => prev.map(msg => {
+          if (msg.id === pusherMessage.messageId) {
+            return {
+              ...msg,
+              metadata: {
+                ...msg.metadata,
+                reactions: pusherMessage.reactions,
+              },
+            };
+          }
+          return msg;
+        }));
       } else if (pusherMessage.type === 'user_joined') {
         setActiveUsers(prev => prev + 1);
       } else if (pusherMessage.type === 'user_left') {
@@ -200,29 +213,20 @@ export function ChatArea({ eventId, onCreateChallenge }: ChatAreaProps) {
 
   const handleReact = async (messageId: number, emoji: string) => {
     try {
-      await fetch(`/api/events/${eventId}/messages/${messageId}/react`, {
+      const response = await fetch(`/api/events/${eventId}/messages/${messageId}/react`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ emoji }),
       });
-      
-      // Update local state optimistically
-      setMessages(prev => prev.map(msg => {
-        if (msg.id === messageId) {
-          const reactions = { ...msg.metadata?.reactions } || {};
-          reactions[emoji] = (reactions[emoji] || 0) + 1;
-          return {
-            ...msg,
-            metadata: {
-              ...msg.metadata,
-              reactions,
-            },
-          };
-        }
-        return msg;
-      }));
+
+      if (!response.ok) {
+        throw new Error('Failed to add reaction');
+      }
+
+      // The Pusher event will update the UI, so we don't need to update local state here
     } catch (error) {
       console.error('Failed to add reaction:', error);
       toast({

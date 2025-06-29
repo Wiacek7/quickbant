@@ -158,6 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/events/:eventId/messages/:messageId/react', isAuthenticated, async (req: any, res) => {
     try {
       const messageId = parseInt(req.params.messageId);
+      const eventId = parseInt(req.params.eventId);
       const { emoji } = req.body;
       const userId = req.user.claims.sub;
 
@@ -165,9 +166,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Emoji is required" });
       }
 
-      // For now, we'll just return success. In a real app, you'd store reactions in the database
-      // and update the message metadata
-      res.json({ success: true, emoji, messageId });
+      // Get the current message to update its metadata
+      const message = await storage.getMessage(messageId);
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+
+      // Parse existing reactions or create new object
+      const reactions = message.metadata?.reactions || {};
+      
+      // Toggle reaction: if user already reacted with this emoji, remove it; otherwise add it
+      if (reactions[emoji]) {
+        reactions[emoji] = Math.max(0, reactions[emoji] - 1);
+        if (reactions[emoji] === 0) {
+          delete reactions[emoji];
+        }
+      } else {
+        reactions[emoji] = (reactions[emoji] || 0) + 1;
+      }
+
+      // Update message metadata
+      const updatedMetadata = {
+        ...message.metadata,
+        reactions
+      };
+
+      await storage.updateMessageMetadata(messageId, updatedMetadata);
+
+      // Broadcast reaction update via Pusher
+      await pusher.trigger(`event-${eventId}`, 'reaction_update', {
+        messageId,
+        reactions,
+        userId,
+        emoji
+      });
+
+      res.json({ success: true, emoji, messageId, reactions });
     } catch (error) {
       console.error("Error adding reaction:", error);
       res.status(500).json({ message: "Failed to add reaction" });
